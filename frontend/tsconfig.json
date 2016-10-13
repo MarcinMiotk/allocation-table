@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "amd",
     "target": "es5",
     "sourceMap": true,
-    "outDir": "dist"
+    "outFile": "dist/allocation-table.js"
   },
   "exclude": [
     "node_modules"

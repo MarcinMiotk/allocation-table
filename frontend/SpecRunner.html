@@ -11,14 +11,19 @@
   <script src="lib/jasmine-2.5.2/jasmine-html.js"></script>
   <script src="lib/jasmine-2.5.2/boot.js"></script>
 
-  <!-- include source files here... -->
-  <script src="dist/main/hello.js"></script>
+  <script type="text/javascript" src="node_modules/requirejs/require.js"></script>
 
-  <!-- include spec files here... -->
-  <script src="dist/test/hello.spec.js"></script>
+
+  <!-- include source files here... -->
+  <script src="dist/allocation-table.js"></script>
+
+  <script>
+    require(["test/providers/TimeTranslatorFake.spec"]);
+  </script>
 
 </head>
 
 <body>
+
 </body>
 </html>
