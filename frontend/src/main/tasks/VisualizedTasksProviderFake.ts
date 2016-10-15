@@ -25,7 +25,7 @@ export class VisualizedTasksProviderFake implements VisualizedTasksProvider {
             nextColor = this.accesibleColors[i];
             tasks.push({
                 id: "TASK-"+i,
-                color: nextColor;
+                color: nextColor
             });
         }
 

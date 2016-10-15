@@ -2,6 +2,32 @@
  * Created by mami on 2016-10-13.
  */
 console.log("Hello World - is said :)");
+define("main/tasks/VisualizedTask", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("main/team/TeamMember", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("main/estimations/EstimationProvider", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("main/estimations/EstimationProviderFake", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var EstimationProviderFake = (function () {
+        function EstimationProviderFake() {
+        }
+        EstimationProviderFake.prototype.estimate = function (what, who) {
+            if (what != null && who != null) {
+                return 4;
+            }
+            else {
+                return 0;
+            }
+        };
+        return EstimationProviderFake;
+    }());
+    exports.EstimationProviderFake = EstimationProviderFake;
+});
 define("main/providers/TimeTranslator", ["require", "exports"], function (require, exports) {
     "use strict";
 });
@@ -50,9 +76,6 @@ define("main/providers/TimeTranslatorFake", ["require", "exports"], function (re
     }());
     exports.TimeTranslatorFake = TimeTranslatorFake;
 });
-define("main/tasks/VisualizedTask", ["require", "exports"], function (require, exports) {
-    "use strict";
-});
 define("main/tasks/VisualizedTasksProvider", ["require", "exports"], function (require, exports) {
     "use strict";
 });
@@ -90,9 +113,51 @@ define("main/tasks/VisualizedTasksProviderFake", ["require", "exports"], functio
     }());
     exports.VisualizedTasksProviderFake = VisualizedTasksProviderFake;
 });
+define("main/team/TeamMembersProvider", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("main/team/TeamMembersProviderFake", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var TeamMembersProviderFake = (function () {
+        function TeamMembersProviderFake() {
+        }
+        TeamMembersProviderFake.prototype.load = function () {
+            var members = new Array();
+            for (var i = 0; i < 8; i++) {
+                members.push({
+                    id: "user" + i
+                });
+            }
+            return members;
+        };
+        return TeamMembersProviderFake;
+    }());
+    exports.TeamMembersProviderFake = TeamMembersProviderFake;
+});
 describe("my first test", function () {
     it("my first expectation :)", function () {
         expect(true).toBeTruthy("What? Why was true not truthy?");
+    });
+});
+define("test/estimations/EstimationProviderFake.spec", ["require", "exports", "main/estimations/EstimationProviderFake"], function (require, exports, EstimationProviderFake_1) {
+    "use strict";
+    describe("In the EstimationProviderFake", function () {
+        describe("the estimate method", function () {
+            var sut = new EstimationProviderFake_1.EstimationProviderFake();
+            it("should return 0 if error", function () {
+                var estimation = sut.estimate(null, null);
+                expect(estimation).toEqual(0);
+            });
+            it("should return at least 4 for any Member and Task combination", function () {
+                var estimation = sut.estimate({
+                    id: "TASK-001",
+                    color: "red"
+                }, {
+                    id: "mami"
+                });
+                expect(estimation).toBeGreaterThanOrEqual(4);
+            });
+        });
     });
 });
 define("test/providers/TimeTranslatorFake.spec", ["require", "exports", "main/providers/TimeTranslatorFake"], function (require, exports, TimeTranslatorFake_1) {
@@ -224,6 +289,34 @@ define("test/tasks/VisualizedTasksProviderFake.spec", ["require", "exports", "ma
             });
         });
         describe("the constructor method", function () {
+        });
+    });
+});
+define("test/team/TeamMembersProviderFake.spec", ["require", "exports", "main/team/TeamMembersProviderFake"], function (require, exports, TeamMembersProviderFake_1) {
+    "use strict";
+    describe("In the TeamMembersProviderFake", function () {
+        describe("the load method", function () {
+            var sut = new TeamMembersProviderFake_1.TeamMembersProviderFake();
+            it("should return 8 elements", function () {
+                expect(sut.load().length).toEqual(8);
+            });
+            it("each item should have unique ID", function () {
+                var members = sut.load();
+                var counters = {};
+                for (var _i = 0, members_1 = members; _i < members_1.length; _i++) {
+                    var member = members_1[_i];
+                    if (counters[member.id] != null) {
+                        counters[member.id] = counters[member.id] + 1;
+                    }
+                    else {
+                        counters[member.id] = 1;
+                    }
+                }
+                for (var _a = 0, members_2 = members; _a < members_2.length; _a++) {
+                    var member = members_2[_a];
+                    expect(counters[member.id]).toEqual(1);
+                }
+            });
         });
     });
 });
