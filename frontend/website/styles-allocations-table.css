@@ -1,0 +1,40 @@
+div.container.allocations {
+    text-align: center;
+    margin: 20px;
+}
+
+div.container.allocations h1 {
+    color: papayawhip;
+}
+
+div.container.allocations table {
+    background-color: whitesmoke;
+    border-spacing: 0px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+div.container.allocations table thead tr {
+    background: orangered;
+    color: floralwhite;
+    font-family: "Times New Roman";
+}
+
+
+div.container.allocations table tbody tr td:first-child {
+    background: lightgoldenrodyellow;
+    width: auto;
+    text-align: right;
+}
+
+div.container.allocations table tbody tr td{
+    background: whitesmoke;
+    width: 50px;
+}
+
+div.container.allocations table tbody tr td:not(:first-child):hover{
+    background: paleturquoise !important;
+}
+
+
+
