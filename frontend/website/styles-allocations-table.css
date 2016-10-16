@@ -30,11 +30,15 @@ div.container.allocations table tbody tr td:first-child {
 div.container.allocations table tbody tr td{
     background: whitesmoke;
     width: 50px;
+    border: 1px dotted white;
 }
 
-div.container.allocations table tbody tr td:not(:first-child):hover{
-    background: paleturquoise !important;
-}
 
+div.container.allocations table tbody tr td.moving {
+    background-color: pink;
+    font-size: xx-small;
+    color: black;
+    border: 1px dashed #2b2b2b;
+}
 
 
