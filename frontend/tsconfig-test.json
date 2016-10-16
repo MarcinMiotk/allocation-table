@@ -3,11 +3,9 @@
     "module": "amd",
     "target": "es5",
     "sourceMap": true,
-    "outFile": "dist/allocation-table.js"
+    "outFile": "dist/allocation-table-test.js"
   },
   "exclude": [
-    "node_modules",
-    "typings",
-    "src/test"
+    "node_modules"
   ]
 }
