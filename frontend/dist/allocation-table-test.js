@@ -1,13 +1,13 @@
-define("tasks/VisualizedTask", ["require", "exports"], function (require, exports) {
+define("main/tasks/VisualizedTask", ["require", "exports"], function (require, exports) {
     "use strict";
 });
-define("team/TeamMember", ["require", "exports"], function (require, exports) {
+define("main/team/TeamMember", ["require", "exports"], function (require, exports) {
     "use strict";
 });
-define("estimations/EstimationProvider", ["require", "exports"], function (require, exports) {
+define("main/estimations/EstimationProvider", ["require", "exports"], function (require, exports) {
     "use strict";
 });
-define("AllocationTablePlugin", ["require", "exports"], function (require, exports) {
+define("main/AllocationTablePlugin", ["require", "exports"], function (require, exports) {
     "use strict";
     var AllocationTablePlugin = (function () {
         function AllocationTablePlugin(table, options) {
@@ -104,13 +104,13 @@ define("AllocationTablePlugin", ["require", "exports"], function (require, expor
  * Created by mami on 2016-10-13.
  */
 console.log("Hello World - is said :)");
-define("allocations/AllocatedTaskToMember", ["require", "exports"], function (require, exports) {
+define("main/allocations/AllocatedTaskToMember", ["require", "exports"], function (require, exports) {
     "use strict";
 });
-define("allocations/AllocationsProvider", ["require", "exports"], function (require, exports) {
+define("main/allocations/AllocationsProvider", ["require", "exports"], function (require, exports) {
     "use strict";
 });
-define("allocations/AllocationsProviderFake", ["require", "exports"], function (require, exports) {
+define("main/allocations/AllocationsProviderFake", ["require", "exports"], function (require, exports) {
     "use strict";
     var AllocationsProviderFake = (function () {
         function AllocationsProviderFake() {
@@ -227,7 +227,7 @@ define("allocations/AllocationsProviderFake", ["require", "exports"], function (
     }());
     exports.AllocationsProviderFake = AllocationsProviderFake;
 });
-define("estimations/EstimationProviderFake", ["require", "exports"], function (require, exports) {
+define("main/estimations/EstimationProviderFake", ["require", "exports"], function (require, exports) {
     "use strict";
     var EstimationProviderFake = (function () {
         function EstimationProviderFake() {
@@ -244,10 +244,10 @@ define("estimations/EstimationProviderFake", ["require", "exports"], function (r
     }());
     exports.EstimationProviderFake = EstimationProviderFake;
 });
-define("providers/TimeTranslator", ["require", "exports"], function (require, exports) {
+define("main/providers/TimeTranslator", ["require", "exports"], function (require, exports) {
     "use strict";
 });
-define("providers/TimeTranslatorFake", ["require", "exports"], function (require, exports) {
+define("main/providers/TimeTranslatorFake", ["require", "exports"], function (require, exports) {
     "use strict";
     var TimeTranslatorFake = (function () {
         function TimeTranslatorFake() {
@@ -292,10 +292,10 @@ define("providers/TimeTranslatorFake", ["require", "exports"], function (require
     }());
     exports.TimeTranslatorFake = TimeTranslatorFake;
 });
-define("tasks/VisualizedTasksProvider", ["require", "exports"], function (require, exports) {
+define("main/tasks/VisualizedTasksProvider", ["require", "exports"], function (require, exports) {
     "use strict";
 });
-define("tasks/VisualizedTasksProviderFake", ["require", "exports"], function (require, exports) {
+define("main/tasks/VisualizedTasksProviderFake", ["require", "exports"], function (require, exports) {
     "use strict";
     var VisualizedTasksProviderFake = (function () {
         function VisualizedTasksProviderFake() {
@@ -329,10 +329,10 @@ define("tasks/VisualizedTasksProviderFake", ["require", "exports"], function (re
     }());
     exports.VisualizedTasksProviderFake = VisualizedTasksProviderFake;
 });
-define("team/TeamMembersProvider", ["require", "exports"], function (require, exports) {
+define("main/team/TeamMembersProvider", ["require", "exports"], function (require, exports) {
     "use strict";
 });
-define("team/TeamMembersProviderFake", ["require", "exports"], function (require, exports) {
+define("main/team/TeamMembersProviderFake", ["require", "exports"], function (require, exports) {
     "use strict";
     var TeamMembersProviderFake = (function () {
         function TeamMembersProviderFake() {
@@ -350,4 +350,218 @@ define("team/TeamMembersProviderFake", ["require", "exports"], function (require
     }());
     exports.TeamMembersProviderFake = TeamMembersProviderFake;
 });
-//# sourceMappingURL=allocation-table.js.map
+describe("my first test", function () {
+    it("my first expectation :)", function () {
+        expect(true).toBeTruthy("What? Why was true not truthy?");
+    });
+});
+define("test/allocations/AllocationsProviderFake.spec", ["require", "exports", "main/allocations/AllocationsProviderFake"], function (require, exports, AllocationsProviderFake_1) {
+    "use strict";
+    describe("In the AllocationsProviderFake", function () {
+        describe("the load allocations", function () {
+            var sut = new AllocationsProviderFake_1.AllocationsProviderFake();
+            it("should return 10 elements", function () {
+                expect(sut.allocations().length).toEqual(10);
+            });
+            it("each item should have unique ID", function () {
+                var allocations = sut.allocations();
+                var counters = {};
+                for (var _i = 0, allocations_1 = allocations; _i < allocations_1.length; _i++) {
+                    var allocation = allocations_1[_i];
+                    if (counters[allocation.what] != null) {
+                        counters[allocation.what] = counters[allocation.what] + 1;
+                    }
+                    else {
+                        counters[allocation.what] = 1;
+                    }
+                }
+                for (var _a = 0, allocations_2 = allocations; _a < allocations_2.length; _a++) {
+                    var allocation = allocations_2[_a];
+                    expect(counters[allocation.what]).toEqual(1);
+                }
+            });
+        });
+    });
+});
+define("test/estimations/EstimationProviderFake.spec", ["require", "exports", "main/estimations/EstimationProviderFake"], function (require, exports, EstimationProviderFake_1) {
+    "use strict";
+    describe("In the EstimationProviderFake", function () {
+        describe("the estimate method", function () {
+            var sut = new EstimationProviderFake_1.EstimationProviderFake();
+            it("should return 0 if error", function () {
+                var estimation = sut.estimate(null, null);
+                expect(estimation).toEqual(0);
+            });
+            it("should return at least 4 for any Member and Task combination", function () {
+                var estimation = sut.estimate({
+                    id: "TASK-001",
+                    color: "red"
+                }, {
+                    id: "mami"
+                });
+                expect(estimation).toBeGreaterThanOrEqual(4);
+            });
+        });
+    });
+});
+define("test/providers/TimeTranslatorFake.spec", ["require", "exports", "main/providers/TimeTranslatorFake"], function (require, exports, TimeTranslatorFake_1) {
+    "use strict";
+    describe("TimeTranslatorFake", function () {
+        it("returns 1 hour", function () {
+            // arrange
+            var time = new TimeTranslatorFake_1.TimeTranslatorFake();
+            // act
+            var result = time.time(1);
+            // assert
+            expect(result).toEqual("2016-10-14 09:00");
+        });
+        it("returns 2 hour", function () {
+            // arrange
+            var time = new TimeTranslatorFake_1.TimeTranslatorFake();
+            // act
+            var result = time.time(2);
+            // assert
+            expect(result).toEqual("2016-10-14 10:00");
+        });
+        it("returns 3 hour", function () {
+            // arrange
+            var time = new TimeTranslatorFake_1.TimeTranslatorFake();
+            // act
+            var result = time.time(3);
+            // assert
+            expect(result).toEqual("2016-10-14 11:00");
+        });
+        it("returns 4 hour", function () {
+            // arrange
+            var time = new TimeTranslatorFake_1.TimeTranslatorFake();
+            // act
+            var result = time.time(4);
+            // assert
+            expect(result).toEqual("2016-10-14 12:00");
+        });
+        it("returns 5 hour", function () {
+            // arrange
+            var time = new TimeTranslatorFake_1.TimeTranslatorFake();
+            // act
+            var result = time.time(5);
+            // assert
+            expect(result).toEqual("2016-10-14 13:00");
+        });
+        it("returns 6 hour", function () {
+            // arrange
+            var time = new TimeTranslatorFake_1.TimeTranslatorFake();
+            // act
+            var result = time.time(6);
+            // assert
+            expect(result).toEqual("2016-10-14 14:00");
+        });
+        it("returns 7 hour", function () {
+            // arrange
+            var time = new TimeTranslatorFake_1.TimeTranslatorFake();
+            // act
+            var result = time.time(7);
+            // assert
+            expect(result).toEqual("2016-10-14 15:00");
+        });
+        it("returns 8 hour", function () {
+            // arrange
+            var time = new TimeTranslatorFake_1.TimeTranslatorFake();
+            // act
+            var result = time.time(8);
+            // assert
+            expect(result).toEqual("2016-10-14 16:00");
+        });
+        it("returns 9 hour", function () {
+            // arrange
+            var time = new TimeTranslatorFake_1.TimeTranslatorFake();
+            // act
+            var result = time.time(9);
+            // assert
+            expect(result).toEqual("2016-10-17 09:00");
+        });
+        it("returns 10 hour", function () {
+            // arrange
+            var time = new TimeTranslatorFake_1.TimeTranslatorFake();
+            // act
+            var result = time.time(10);
+            // assert
+            expect(result).toEqual("2016-10-17 10:00");
+        });
+    });
+});
+define("test/tasks/VisualizedTasksProviderFake.spec", ["require", "exports", "main/tasks/VisualizedTasksProviderFake"], function (require, exports, VisualizedTasksProviderFake_1) {
+    "use strict";
+    describe("In the VisualizedTasksProviderFake", function () {
+        describe("the load method", function () {
+            var sut = new VisualizedTasksProviderFake_1.VisualizedTasksProviderFake();
+            it("should return 10 elements", function () {
+                expect(sut.load().length).toEqual(10);
+            });
+            it("each item should have unique ID", function () {
+                var tasks = sut.load();
+                var counters = {};
+                for (var _i = 0, tasks_1 = tasks; _i < tasks_1.length; _i++) {
+                    var task = tasks_1[_i];
+                    if (counters[task.id] != null) {
+                        counters[task.id] = counters[task.id] + 1;
+                    }
+                    else {
+                        counters[task.id] = 1;
+                    }
+                }
+                for (var _a = 0, tasks_2 = tasks; _a < tasks_2.length; _a++) {
+                    var task = tasks_2[_a];
+                    expect(counters[task.id]).toEqual(1);
+                }
+            });
+            it("each item should have unique color", function () {
+                var tasks = sut.load();
+                var counters = {};
+                for (var _i = 0, tasks_3 = tasks; _i < tasks_3.length; _i++) {
+                    var task = tasks_3[_i];
+                    if (counters[task.color] != null) {
+                        counters[task.color] = counters[task.color] + 1;
+                    }
+                    else {
+                        counters[task.color] = 1;
+                    }
+                }
+                for (var _a = 0, tasks_4 = tasks; _a < tasks_4.length; _a++) {
+                    var task = tasks_4[_a];
+                    expect(counters[task.color]).toEqual(1);
+                }
+            });
+        });
+        describe("the constructor method", function () {
+        });
+    });
+});
+define("test/team/TeamMembersProviderFake.spec", ["require", "exports", "main/team/TeamMembersProviderFake"], function (require, exports, TeamMembersProviderFake_1) {
+    "use strict";
+    describe("In the TeamMembersProviderFake", function () {
+        describe("the load method", function () {
+            var sut = new TeamMembersProviderFake_1.TeamMembersProviderFake();
+            it("should return 8 elements", function () {
+                expect(sut.load().length).toEqual(8);
+            });
+            it("each item should have unique ID", function () {
+                var members = sut.load();
+                var counters = {};
+                for (var _i = 0, members_1 = members; _i < members_1.length; _i++) {
+                    var member = members_1[_i];
+                    if (counters[member.id] != null) {
+                        counters[member.id] = counters[member.id] + 1;
+                    }
+                    else {
+                        counters[member.id] = 1;
+                    }
+                }
+                for (var _a = 0, members_2 = members; _a < members_2.length; _a++) {
+                    var member = members_2[_a];
+                    expect(counters[member.id]).toEqual(1);
+                }
+            });
+        });
+    });
+});
+//# sourceMappingURL=allocation-table-test.js.map
