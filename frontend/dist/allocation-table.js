@@ -7,39 +7,119 @@ define("team/TeamMember", ["require", "exports"], function (require, exports) {
 define("estimations/EstimationProvider", ["require", "exports"], function (require, exports) {
     "use strict";
 });
-define("AllocationTablePlugin", ["require", "exports"], function (require, exports) {
+define("team/TeamMembersProvider", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("ui/TeamMembersBodyCellsBuilder", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var TeamMembersBodyCellsBuilder = (function () {
+        function TeamMembersBodyCellsBuilder() {
+        }
+        TeamMembersBodyCellsBuilder.prototype.build = function (table, provider) {
+            this.removeAllTeamCellsFromBodyTemplate(table);
+            //
+            var tr = table.find("tbody tr");
+            for (var _i = 0, _a = provider.load(); _i < _a.length; _i++) {
+                var member = _a[_i];
+                var cell = jQuery("<td>");
+                cell.text(member.id);
+                tr.append(cell);
+            }
+        };
+        TeamMembersBodyCellsBuilder.prototype.removeAllTeamCellsFromBodyTemplate = function (table) {
+            table.find("tbody tr td:not(:first-child)").remove();
+        };
+        return TeamMembersBodyCellsBuilder;
+    }());
+    exports.TeamMembersBodyCellsBuilder = TeamMembersBodyCellsBuilder;
+});
+define("ui/TeamMembersHeaderBuilder", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var TeamMembersHeaderBuilder = (function () {
+        function TeamMembersHeaderBuilder() {
+        }
+        TeamMembersHeaderBuilder.prototype.build = function (table, provider) {
+            this.removeAllTeamHeadersFromTemplate(table);
+            var tr = table.find("thead tr");
+            for (var _i = 0, _a = provider.load(); _i < _a.length; _i++) {
+                var member = _a[_i];
+                var header = jQuery("<th>");
+                header.text(member.id);
+                tr.append(header);
+            }
+        };
+        TeamMembersHeaderBuilder.prototype.removeAllTeamHeadersFromTemplate = function (table) {
+            table.find("thead tr th:not(:first-child)").remove();
+        };
+        return TeamMembersHeaderBuilder;
+    }());
+    exports.TeamMembersHeaderBuilder = TeamMembersHeaderBuilder;
+});
+define("providers/TimeTranslator", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("ui/TimescaleBodyCellsBuilder", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var TimescaleBodyCellsBuilder = (function () {
+        function TimescaleBodyCellsBuilder() {
+        }
+        TimescaleBodyCellsBuilder.prototype.build = function (table, allHours, timeTranslator) {
+            this.removeAllTimescaleRows(table);
+            //
+            var body = table.find("tbody");
+            for (var i = 1; i < allHours(); i++) {
+                var row = jQuery("<tr>");
+                {
+                    var timeTd = jQuery("<td>");
+                    timeTd.text(timeTranslator.time(i));
+                    row.append(timeTd);
+                }
+                body.append(row);
+            }
+        };
+        TimescaleBodyCellsBuilder.prototype.removeAllTimescaleRows = function (table) {
+            table.find("tbody tr").remove();
+        };
+        return TimescaleBodyCellsBuilder;
+    }());
+    exports.TimescaleBodyCellsBuilder = TimescaleBodyCellsBuilder;
+});
+define("AllocationTablePlugin", ["require", "exports", "ui/TeamMembersBodyCellsBuilder", "ui/TeamMembersHeaderBuilder", "ui/TimescaleBodyCellsBuilder"], function (require, exports, TeamMembersBodyCellsBuilder_1, TeamMembersHeaderBuilder_1, TimescaleBodyCellsBuilder_1) {
     "use strict";
     var AllocationTablePlugin = (function () {
         function AllocationTablePlugin(table, options) {
-            this.repository = new AllocationsRepository();
+            this.mapping = new TeamMemberAndTimeCellMapping();
             this.table = table;
             this.options = options;
         }
         AllocationTablePlugin.prototype.attach = function () {
+            new TeamMembersHeaderBuilder_1.TeamMembersHeaderBuilder().build(this.table, this.options.teamMembersProvider);
+            new TimescaleBodyCellsBuilder_1.TimescaleBodyCellsBuilder().build(this.table, this.options.countHoursInTimescale, this.options.timeTranslator);
+            new TeamMembersBodyCellsBuilder_1.TeamMembersBodyCellsBuilder().build(this.table, this.options.teamMembersProvider);
             this.table.find(this.options.gridElementsSelector).each(jQuery.proxy(this.forEachCell, this));
         };
         AllocationTablePlugin.prototype.forEachCell = function (index, element) {
             jQuery(element).removeAttr("style"); // clear presentation suggestions
-            var moment = new TeamMemberAllocationMoment(index, jQuery(element), this, this.options.countTeamMembers);
+            var moment = new TeamMemberAndTimeCell(index, jQuery(element), this, this.options.countTeamMembers);
             moment.attach();
-            this.repository.add(moment);
+            this.mapping.registerCell(moment);
         };
         return AllocationTablePlugin;
     }());
     exports.AllocationTablePlugin = AllocationTablePlugin;
-    var TeamMemberAllocationMoment = (function () {
-        function TeamMemberAllocationMoment(gridIndex, cell, plugin, countTeamMembersFunction) {
+    var TeamMemberAndTimeCell = (function () {
+        function TeamMemberAndTimeCell(gridIndex, cell, plugin, countTeamMembersFunction) {
             this.cell = cell;
             this.plugin = plugin;
             var teamMembers = countTeamMembersFunction();
             this.teamMemberIndex = gridIndex % teamMembers;
             this.sequence = Math.floor(gridIndex / teamMembers);
         }
-        TeamMemberAllocationMoment.prototype.attach = function () {
+        TeamMemberAndTimeCell.prototype.attach = function () {
             this.cell.data("allocation-moment", this);
             this.cell.hover(jQuery.proxy(this.onCellHoverIn, this), jQuery.proxy(this.onCellHoverOut, this));
         };
-        TeamMemberAllocationMoment.prototype.onCellHoverIn = function (event) {
+        TeamMemberAndTimeCell.prototype.onCellHoverIn = function (event) {
             var m = jQuery(event.target).data("allocation-moment");
             var estimation = this.plugin.options.estimationProvider.estimate({
                 id: "TODO",
@@ -52,7 +132,7 @@ define("AllocationTablePlugin", ["require", "exports"], function (require, expor
                 moment.cell.text("moving");
             }, estimation);
         };
-        TeamMemberAllocationMoment.prototype.onCellHoverOut = function (event) {
+        TeamMemberAndTimeCell.prototype.onCellHoverOut = function (event) {
             this.forConsecutiveTeamCells(event, function (moment) {
                 if (moment.cell.hasClass("moving")) {
                     moment.cell.removeClass("moving");
@@ -60,10 +140,10 @@ define("AllocationTablePlugin", ["require", "exports"], function (require, expor
                 }
             });
         };
-        TeamMemberAllocationMoment.prototype.forConsecutiveTeamCells = function (event, handler, estimation) {
+        TeamMemberAndTimeCell.prototype.forConsecutiveTeamCells = function (event, handler, estimation) {
             if (estimation === void 0) { estimation = 10000; }
             var moment = jQuery(event.target).data("allocation-moment");
-            var nextElements = this.plugin.repository.getNextElementsByTeamMember(moment);
+            var nextElements = this.plugin.mapping.getNextElementsByTeamMember(moment);
             var howManyCells = estimation;
             var i = 1;
             for (var _i = 0, nextElements_1 = nextElements; _i < nextElements_1.length; _i++) {
@@ -75,20 +155,20 @@ define("AllocationTablePlugin", ["require", "exports"], function (require, expor
                 }
             }
         };
-        return TeamMemberAllocationMoment;
+        return TeamMemberAndTimeCell;
     }());
-    exports.TeamMemberAllocationMoment = TeamMemberAllocationMoment;
-    var AllocationsRepository = (function () {
-        function AllocationsRepository() {
+    exports.TeamMemberAndTimeCell = TeamMemberAndTimeCell;
+    var TeamMemberAndTimeCellMapping = (function () {
+        function TeamMemberAndTimeCellMapping() {
             this.byTeamMember = {};
         }
-        AllocationsRepository.prototype.add = function (moment) {
+        TeamMemberAndTimeCellMapping.prototype.registerCell = function (moment) {
             if (this.byTeamMember[moment.teamMemberIndex] == null) {
                 this.byTeamMember[moment.teamMemberIndex] = new Array();
             }
             this.byTeamMember[moment.teamMemberIndex].push(moment);
         };
-        AllocationsRepository.prototype.getNextElementsByTeamMember = function (moment) {
+        TeamMemberAndTimeCellMapping.prototype.getNextElementsByTeamMember = function (moment) {
             var meAndNextElements = new Array();
             var allCellsOfMember = this.byTeamMember[moment.teamMemberIndex];
             for (var i = moment.sequence; i < allCellsOfMember.length; i++) {
@@ -96,9 +176,9 @@ define("AllocationTablePlugin", ["require", "exports"], function (require, expor
             }
             return meAndNextElements;
         };
-        return AllocationsRepository;
+        return TeamMemberAndTimeCellMapping;
     }());
-    exports.AllocationsRepository = AllocationsRepository;
+    exports.TeamMemberAndTimeCellMapping = TeamMemberAndTimeCellMapping;
 });
 /**
  * Created by mami on 2016-10-13.
@@ -168,60 +248,6 @@ define("allocations/AllocationsProviderFake", ["require", "exports"], function (
                 hourStart: 3
             });
             return allocations;
-            /*
-                    return [
-                        {
-                            what: "TASK-1",
-                            who: "mami",
-                            hourStart: 3
-                        },
-                        {
-                            what: "TASK-1",
-                            who: "mami",
-                            hourStart: 3
-                        },
-                        {
-                            what: "TASK-1",
-                            who: "mami",
-                            hourStart: 3
-                        },
-                        {
-                            what: "TASK-1",
-                            who: "mami",
-                            hourStart: 3
-                        },
-                        {
-                            what: "TASK-1",
-                            who: "mami",
-                            hourStart: 3
-                        },
-                        {
-                            what: "TASK-1",
-                            who: "mami",
-                            hourStart: 3
-                        },
-                        {
-                            what: "TASK-1",
-                            who: "mami",
-                            hourStart: 3
-                        },
-                        {
-                            what: "TASK-1",
-                            who: "mami",
-                            hourStart: 3
-                        },
-                        {
-                            what: "TASK-1",
-                            who: "mami",
-                            hourStart: 3
-                        },
-                        {
-                            what: "TASK-1",
-                            who: "mami",
-                            hourStart: 3
-                        }
-                    ];
-                    */
         };
         return AllocationsProviderFake;
     }());
@@ -243,9 +269,6 @@ define("estimations/EstimationProviderFake", ["require", "exports"], function (r
         return EstimationProviderFake;
     }());
     exports.EstimationProviderFake = EstimationProviderFake;
-});
-define("providers/TimeTranslator", ["require", "exports"], function (require, exports) {
-    "use strict";
 });
 define("providers/TimeTranslatorFake", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -292,6 +315,20 @@ define("providers/TimeTranslatorFake", ["require", "exports"], function (require
     }());
     exports.TimeTranslatorFake = TimeTranslatorFake;
 });
+define("providers/TimeTranslatorSecondFake", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var TimeTranslatorSecondFake = (function () {
+        function TimeTranslatorSecondFake() {
+        }
+        TimeTranslatorSecondFake.prototype.time = function (timeSequenceIndex) {
+            var result = "";
+            result = "Godzina " + timeSequenceIndex;
+            return result;
+        };
+        return TimeTranslatorSecondFake;
+    }());
+    exports.TimeTranslatorSecondFake = TimeTranslatorSecondFake;
+});
 define("tasks/VisualizedTasksProvider", ["require", "exports"], function (require, exports) {
     "use strict";
 });
@@ -328,9 +365,6 @@ define("tasks/VisualizedTasksProviderFake", ["require", "exports"], function (re
         return VisualizedTasksProviderFake;
     }());
     exports.VisualizedTasksProviderFake = VisualizedTasksProviderFake;
-});
-define("team/TeamMembersProvider", ["require", "exports"], function (require, exports) {
-    "use strict";
 });
 define("team/TeamMembersProviderFake", ["require", "exports"], function (require, exports) {
     "use strict";

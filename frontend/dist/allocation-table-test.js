@@ -11,7 +11,7 @@ define("main/AllocationTablePlugin", ["require", "exports"], function (require, 
     "use strict";
     var AllocationTablePlugin = (function () {
         function AllocationTablePlugin(table, options) {
-            this.repository = new AllocationsRepository();
+            this.mapping = new AllocationsRepository();
             this.table = table;
             this.options = options;
         }
@@ -22,7 +22,7 @@ define("main/AllocationTablePlugin", ["require", "exports"], function (require, 
             jQuery(element).removeAttr("style"); // clear presentation suggestions
             var moment = new TeamMemberAllocationMoment(index, jQuery(element), this, this.options.countTeamMembers);
             moment.attach();
-            this.repository.add(moment);
+            this.mapping.registerCell(moment);
         };
         return AllocationTablePlugin;
     }());
@@ -63,7 +63,7 @@ define("main/AllocationTablePlugin", ["require", "exports"], function (require, 
         TeamMemberAllocationMoment.prototype.forConsecutiveTeamCells = function (event, handler, estimation) {
             if (estimation === void 0) { estimation = 10000; }
             var moment = jQuery(event.target).data("allocation-moment");
-            var nextElements = this.plugin.repository.getNextElementsByTeamMember(moment);
+            var nextElements = this.plugin.mapping.getNextElementsByTeamMember(moment);
             var howManyCells = estimation;
             var i = 1;
             for (var _i = 0, nextElements_1 = nextElements; _i < nextElements_1.length; _i++) {
