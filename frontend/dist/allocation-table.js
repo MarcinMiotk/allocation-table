@@ -10,8 +10,82 @@ define("estimations/EstimationProvider", ["require", "exports"], function (requi
 define("team/TeamMembersProvider", ["require", "exports"], function (require, exports) {
     "use strict";
 });
+define("ui/TimeHandler", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("ui/TeamMemberAndTimeCell", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var TeamMemberAndTimeCell = (function () {
+        function TeamMemberAndTimeCell(cell, teamMemberHandler, timeHandler) {
+            this.cell = cell;
+            this.teamMemberHandler = teamMemberHandler;
+            this.timeHandler = timeHandler;
+            // push me
+            this.teamMemberHandler.member.registerCell(this);
+        }
+        TeamMemberAndTimeCell.prototype.attach = function () {
+            this.cell.data("allocation-moment", this);
+            this.cell.hover(jQuery.proxy(this.onCellHoverIn, this), jQuery.proxy(this.onCellHoverOut, this));
+        };
+        TeamMemberAndTimeCell.prototype.onCellHoverIn = function (event) {
+            var cell = jQuery(event.target).data("allocation-moment");
+            var estimation = cell.teamMemberHandler.member.estimateFor({
+                id: "TODO",
+                color: "TODO" // todo
+            });
+            this.forConsecutiveTeamCells(event, function (moment) {
+                moment.cell.addClass("moving");
+                moment.cell.text("moving");
+            }, estimation);
+        };
+        TeamMemberAndTimeCell.prototype.onCellHoverOut = function (event) {
+            this.forConsecutiveTeamCells(event, function (moment) {
+                if (moment.cell.hasClass("moving")) {
+                    moment.cell.removeClass("moving");
+                    moment.cell.text("");
+                }
+            });
+        };
+        TeamMemberAndTimeCell.prototype.forConsecutiveTeamCells = function (event, handler, estimation) {
+            if (estimation === void 0) { estimation = 10000; }
+            var cell = jQuery(event.target).data("allocation-moment");
+            var nextElements = cell.teamMemberHandler.member.getNextCells(cell.timeHandler.id);
+            var howManyCells = estimation;
+            var i = 1;
+            for (var _i = 0, nextElements_1 = nextElements; _i < nextElements_1.length; _i++) {
+                var cell_1 = nextElements_1[_i];
+                handler(cell_1);
+                i++;
+                if (i > howManyCells) {
+                    break;
+                }
+            }
+        };
+        return TeamMemberAndTimeCell;
+    }());
+    exports.TeamMemberAndTimeCell = TeamMemberAndTimeCell;
+});
 define("ui/TeamMemberHandler", ["require", "exports"], function (require, exports) {
     "use strict";
+    var TeamMemberHandlerOperations = (function () {
+        function TeamMemberHandlerOperations(member, estimateFor) {
+            this.member = member;
+            this.estimateFor = estimateFor;
+            this.cells = new Array();
+        }
+        TeamMemberHandlerOperations.prototype.registerCell = function (cell) {
+            this.cells.push(cell);
+        };
+        TeamMemberHandlerOperations.prototype.getNextCells = function (sinceTimeSequenceId) {
+            var meAndNextElements = new Array();
+            for (var i = sinceTimeSequenceId; i < this.cells.length; i++) {
+                meAndNextElements.push(this.cells[i]);
+            }
+            return meAndNextElements;
+        };
+        return TeamMemberHandlerOperations;
+    }());
+    exports.TeamMemberHandlerOperations = TeamMemberHandlerOperations;
 });
 define("ui/TeamMemberHandlerAccessor", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -28,9 +102,6 @@ define("ui/TeamMemberHandlerAccessor", ["require", "exports"], function (require
     }());
     exports.TeamMemberHandlerAccessor = TeamMemberHandlerAccessor;
 });
-define("ui/TimeHandler", ["require", "exports"], function (require, exports) {
-    "use strict";
-});
 define("ui/TimeHandlerAccessor", ["require", "exports"], function (require, exports) {
     "use strict";
     var TimeHandlerAccessor = (function () {
@@ -46,11 +117,24 @@ define("ui/TimeHandlerAccessor", ["require", "exports"], function (require, expo
     }());
     exports.TimeHandlerAccessor = TimeHandlerAccessor;
 });
-define("ui/TeamMembersBodyCellsBuilder", ["require", "exports", "ui/TeamMemberHandlerAccessor", "ui/TimeHandlerAccessor"], function (require, exports, TeamMemberHandlerAccessor_1, TimeHandlerAccessor_1) {
+define("allocations/AllocatedTaskToMember", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("ui/TeamMembersBodyCellsBuilder", ["require", "exports", "ui/TeamMemberHandlerAccessor", "ui/TeamMemberHandler"], function (require, exports, TeamMemberHandlerAccessor_1, TeamMemberHandler_1) {
     "use strict";
     var TeamMembersBodyCellsBuilder = (function () {
-        function TeamMembersBodyCellsBuilder(provider) {
-            this.provider = provider;
+        function TeamMembersBodyCellsBuilder(provider, estimationProvider) {
+            this.members = new Array();
+            var _loop_1 = function(member) {
+                this_1.members.push(new TeamMemberHandler_1.TeamMemberHandlerOperations(member, function (what) {
+                    return estimationProvider.estimate(what, member);
+                }));
+            };
+            var this_1 = this;
+            for (var _i = 0, _a = provider.load(); _i < _a.length; _i++) {
+                var member = _a[_i];
+                _loop_1(member);
+            }
         }
         TeamMembersBodyCellsBuilder.prototype.build = function (table) {
             this.removeAllTeamCellsFromBodyTemplate(table);
@@ -58,10 +142,9 @@ define("ui/TeamMembersBodyCellsBuilder", ["require", "exports", "ui/TeamMemberHa
         };
         TeamMembersBodyCellsBuilder.prototype.forEachRow = function (index, element) {
             var tr = jQuery(element);
-            for (var _i = 0, _a = this.provider.load(); _i < _a.length; _i++) {
+            for (var _i = 0, _a = this.members; _i < _a.length; _i++) {
                 var member = _a[_i];
                 var cell = jQuery("<td>");
-                cell.text(member.id + " hour " + TimeHandlerAccessor_1.TimeHandlerAccessor.get(tr).id);
                 var handler = {
                     member: member
                 };
@@ -71,6 +154,31 @@ define("ui/TeamMembersBodyCellsBuilder", ["require", "exports", "ui/TeamMemberHa
         };
         TeamMembersBodyCellsBuilder.prototype.removeAllTeamCellsFromBodyTemplate = function (table) {
             table.find("tbody tr td:not(:first-child)").remove();
+        };
+        // ==============
+        TeamMembersBodyCellsBuilder.prototype.display = function (who, what, hourStart) {
+            var member = this.get(who);
+            var consecutiveCells = member.getNextCells(hourStart);
+            var estimation = member.estimateFor(what);
+            var coloredHours = 0;
+            for (var _i = 0, consecutiveCells_1 = consecutiveCells; _i < consecutiveCells_1.length; _i++) {
+                var c = consecutiveCells_1[_i];
+                c.cell.css("background-color", what.color);
+                //  c.cell.text(what.id);
+                coloredHours++;
+                if (coloredHours >= estimation) {
+                    break;
+                }
+            }
+        };
+        TeamMembersBodyCellsBuilder.prototype.get = function (memberId) {
+            for (var _i = 0, _a = this.members; _i < _a.length; _i++) {
+                var member = _a[_i];
+                if (member.member.id == memberId) {
+                    return member;
+                }
+            }
+            return null;
         };
         return TeamMembersBodyCellsBuilder;
     }());
@@ -101,7 +209,7 @@ define("ui/TeamMembersHeaderBuilder", ["require", "exports"], function (require,
 define("providers/TimeTranslator", ["require", "exports"], function (require, exports) {
     "use strict";
 });
-define("ui/TimescaleBodyCellsBuilder", ["require", "exports", "ui/TimeHandlerAccessor"], function (require, exports, TimeHandlerAccessor_2) {
+define("ui/TimescaleBodyCellsBuilder", ["require", "exports", "ui/TimeHandlerAccessor"], function (require, exports, TimeHandlerAccessor_1) {
     "use strict";
     var TimescaleBodyCellsBuilder = (function () {
         function TimescaleBodyCellsBuilder() {
@@ -125,7 +233,7 @@ define("ui/TimescaleBodyCellsBuilder", ["require", "exports", "ui/TimeHandlerAcc
             var handler = {
                 id: hourId
             };
-            TimeHandlerAccessor_2.TimeHandlerAccessor.set(row, handler);
+            TimeHandlerAccessor_1.TimeHandlerAccessor.set(row, handler);
         };
         TimescaleBodyCellsBuilder.prototype.removeAllTimescaleRows = function (table) {
             table.find("tbody tr").remove();
@@ -134,105 +242,49 @@ define("ui/TimescaleBodyCellsBuilder", ["require", "exports", "ui/TimeHandlerAcc
     }());
     exports.TimescaleBodyCellsBuilder = TimescaleBodyCellsBuilder;
 });
-define("ui/TeamMemberAndTimeCell", ["require", "exports"], function (require, exports) {
+define("allocations/AllocationsProvider", ["require", "exports"], function (require, exports) {
     "use strict";
-    var TeamMemberAndTimeCell = (function () {
-        function TeamMemberAndTimeCell(gridIndex, cell, plugin, countTeamMembersFunction) {
-            this.cell = cell;
-            this.plugin = plugin;
-            var teamMembers = countTeamMembersFunction();
-            this.teamMemberIndex = gridIndex % teamMembers;
-            this.sequence = Math.floor(gridIndex / teamMembers);
-        }
-        TeamMemberAndTimeCell.prototype.attach = function () {
-            this.cell.data("allocation-moment", this);
-            this.cell.hover(jQuery.proxy(this.onCellHoverIn, this), jQuery.proxy(this.onCellHoverOut, this));
-        };
-        TeamMemberAndTimeCell.prototype.onCellHoverIn = function (event) {
-            var m = jQuery(event.target).data("allocation-moment");
-            var estimation = this.plugin.options.estimationProvider.estimate({
-                id: "TODO",
-                color: "TODO" // todo
-            }, {
-                id: "TODO-001" // todo
-            });
-            this.forConsecutiveTeamCells(event, function (moment) {
-                moment.cell.addClass("moving");
-                moment.cell.text("moving");
-            }, estimation);
-        };
-        TeamMemberAndTimeCell.prototype.onCellHoverOut = function (event) {
-            this.forConsecutiveTeamCells(event, function (moment) {
-                if (moment.cell.hasClass("moving")) {
-                    moment.cell.removeClass("moving");
-                    moment.cell.text("");
-                }
-            });
-        };
-        TeamMemberAndTimeCell.prototype.forConsecutiveTeamCells = function (event, handler, estimation) {
-            if (estimation === void 0) { estimation = 10000; }
-            var moment = jQuery(event.target).data("allocation-moment");
-            var nextElements = this.plugin.mapping.getNextElementsByTeamMember(moment);
-            var howManyCells = estimation;
-            var i = 1;
-            for (var _i = 0, nextElements_1 = nextElements; _i < nextElements_1.length; _i++) {
-                var cell = nextElements_1[_i];
-                handler(cell);
-                i++;
-                if (i > howManyCells) {
-                    break;
-                }
-            }
-        };
-        return TeamMemberAndTimeCell;
-    }());
-    exports.TeamMemberAndTimeCell = TeamMemberAndTimeCell;
 });
-define("ui/TeamMemberAndTimeCellMapping", ["require", "exports"], function (require, exports) {
+define("tasks/VisualizedTasksProvider", ["require", "exports"], function (require, exports) {
     "use strict";
-    var TeamMemberAndTimeCellMapping = (function () {
-        function TeamMemberAndTimeCellMapping() {
-            this.byTeamMember = {};
-        }
-        TeamMemberAndTimeCellMapping.prototype.registerCell = function (moment) {
-            if (this.byTeamMember[moment.teamMemberIndex] == null) {
-                this.byTeamMember[moment.teamMemberIndex] = new Array();
-            }
-            this.byTeamMember[moment.teamMemberIndex].push(moment);
-        };
-        TeamMemberAndTimeCellMapping.prototype.getNextElementsByTeamMember = function (moment) {
-            var meAndNextElements = new Array();
-            var allCellsOfMember = this.byTeamMember[moment.teamMemberIndex];
-            for (var i = moment.sequence; i < allCellsOfMember.length; i++) {
-                meAndNextElements.push(allCellsOfMember[i]);
-            }
-            return meAndNextElements;
-        };
-        return TeamMemberAndTimeCellMapping;
-    }());
-    exports.TeamMemberAndTimeCellMapping = TeamMemberAndTimeCellMapping;
 });
-define("AllocationTablePlugin", ["require", "exports", "ui/TeamMembersBodyCellsBuilder", "ui/TeamMembersHeaderBuilder", "ui/TimescaleBodyCellsBuilder", "ui/TeamMemberAndTimeCellMapping", "ui/TeamMemberAndTimeCell", "ui/TeamMemberHandlerAccessor", "ui/TimeHandlerAccessor"], function (require, exports, TeamMembersBodyCellsBuilder_1, TeamMembersHeaderBuilder_1, TimescaleBodyCellsBuilder_1, TeamMemberAndTimeCellMapping_1, TeamMemberAndTimeCell_1, TeamMemberHandlerAccessor_2, TimeHandlerAccessor_3) {
+define("AllocationTablePlugin", ["require", "exports", "ui/TeamMembersBodyCellsBuilder", "ui/TeamMembersHeaderBuilder", "ui/TimescaleBodyCellsBuilder", "ui/TeamMemberAndTimeCell", "ui/TeamMemberHandlerAccessor", "ui/TimeHandlerAccessor"], function (require, exports, TeamMembersBodyCellsBuilder_1, TeamMembersHeaderBuilder_1, TimescaleBodyCellsBuilder_1, TeamMemberAndTimeCell_1, TeamMemberHandlerAccessor_2, TimeHandlerAccessor_2) {
     "use strict";
     var AllocationTablePlugin = (function () {
         function AllocationTablePlugin(table, options) {
-            this.mapping = new TeamMemberAndTimeCellMapping_1.TeamMemberAndTimeCellMapping();
             this.table = table;
             this.options = options;
         }
         AllocationTablePlugin.prototype.attach = function () {
             new TeamMembersHeaderBuilder_1.TeamMembersHeaderBuilder().build(this.table, this.options.teamMembersProvider);
             new TimescaleBodyCellsBuilder_1.TimescaleBodyCellsBuilder().build(this.table, this.options.countHoursInTimescale, this.options.timeTranslator);
-            new TeamMembersBodyCellsBuilder_1.TeamMembersBodyCellsBuilder(this.options.teamMembersProvider).build(this.table);
+            //
+            var cellsBuilder = new TeamMembersBodyCellsBuilder_1.TeamMembersBodyCellsBuilder(this.options.teamMembersProvider, this.options.estimationProvider);
+            cellsBuilder.build(this.table);
+            this.cachedCellsBuilder = cellsBuilder;
+            //
             this.table.find(this.options.gridElementsSelector).each(jQuery.proxy(this.forEachCell, this));
+            return this;
+        };
+        AllocationTablePlugin.prototype.display = function (provider, tasksProvider) {
+            var tasksCache = {};
+            for (var _i = 0, _a = tasksProvider.load(); _i < _a.length; _i++) {
+                var task = _a[_i];
+                tasksCache[task.id] = task;
+            }
+            var allocations = provider.allocations();
+            for (var _b = 0, allocations_1 = allocations; _b < allocations_1.length; _b++) {
+                var allocated = allocations_1[_b];
+                this.cachedCellsBuilder.display(allocated.who, tasksCache[allocated.what], allocated.hourStart);
+            }
+            return this;
         };
         AllocationTablePlugin.prototype.forEachCell = function (index, element) {
             var cell = jQuery(element);
             var memberHandler = TeamMemberHandlerAccessor_2.TeamMemberHandlerAccessor.get(cell);
-            var timeHandler = TimeHandlerAccessor_3.TimeHandlerAccessor.get(cell.parent());
-            var moment = new TeamMemberAndTimeCell_1.TeamMemberAndTimeCell(index, cell, this, this.options.countTeamMembers);
+            var timeHandler = TimeHandlerAccessor_2.TimeHandlerAccessor.get(cell.parent());
+            var moment = new TeamMemberAndTimeCell_1.TeamMemberAndTimeCell(cell, memberHandler, timeHandler);
             moment.attach();
-            this.mapping.registerCell(moment);
         };
         return AllocationTablePlugin;
     }());
@@ -242,12 +294,6 @@ define("AllocationTablePlugin", ["require", "exports", "ui/TeamMembersBodyCellsB
  * Created by mami on 2016-10-13.
  */
 console.log("Hello World - is said :)");
-define("allocations/AllocatedTaskToMember", ["require", "exports"], function (require, exports) {
-    "use strict";
-});
-define("allocations/AllocationsProvider", ["require", "exports"], function (require, exports) {
-    "use strict";
-});
 define("allocations/AllocationsProviderFake", ["require", "exports"], function (require, exports) {
     "use strict";
     var AllocationsProviderFake = (function () {
@@ -257,52 +303,47 @@ define("allocations/AllocationsProviderFake", ["require", "exports"], function (
             var allocations = new Array();
             allocations.push({
                 what: "TASK-1",
-                who: "mami",
-                hourStart: 3
+                who: "user0",
+                hourStart: 22
             });
             allocations.push({
                 what: "TASK-2",
-                who: "mami",
-                hourStart: 3
+                who: "user1",
+                hourStart: 14
             });
             allocations.push({
                 what: "TASK-3",
-                who: "mami",
-                hourStart: 3
+                who: "user1",
+                hourStart: 10
             });
             allocations.push({
                 what: "TASK-4",
-                who: "mami",
+                who: "user3",
                 hourStart: 3
             });
             allocations.push({
                 what: "TASK-5",
-                who: "mami",
-                hourStart: 3
+                who: "user4",
+                hourStart: 7
             });
             allocations.push({
                 what: "TASK-6",
-                who: "mami",
-                hourStart: 3
+                who: "user4",
+                hourStart: 18
             });
             allocations.push({
                 what: "TASK-7",
-                who: "mami",
+                who: "user5",
                 hourStart: 3
             });
             allocations.push({
                 what: "TASK-8",
-                who: "mami",
-                hourStart: 3
+                who: "user6",
+                hourStart: 12
             });
             allocations.push({
                 what: "TASK-9",
-                who: "mami",
-                hourStart: 3
-            });
-            allocations.push({
-                what: "TASK-10",
-                who: "mami",
+                who: "user7",
                 hourStart: 3
             });
             return allocations;
@@ -318,6 +359,14 @@ define("estimations/EstimationProviderFake", ["require", "exports"], function (r
         }
         EstimationProviderFake.prototype.estimate = function (what, who) {
             if (what != null && who != null) {
+                /*
+                if(who.id=="user0") {
+                    return 5;
+                }
+                if(who.id=="user1") {
+                    return 3;
+                }
+                */
                 return 4;
             }
             else {
@@ -386,9 +435,6 @@ define("providers/TimeTranslatorSecondFake", ["require", "exports"], function (r
         return TimeTranslatorSecondFake;
     }());
     exports.TimeTranslatorSecondFake = TimeTranslatorSecondFake;
-});
-define("tasks/VisualizedTasksProvider", ["require", "exports"], function (require, exports) {
-    "use strict";
 });
 define("tasks/VisualizedTasksProviderFake", ["require", "exports"], function (require, exports) {
     "use strict";

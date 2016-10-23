@@ -1,17 +1,17 @@
-import {AllocationTablePlugin} from "../AllocationTablePlugin";
+import {TeamMemberHandler} from "./TeamMemberHandler";
+import {TimeHandler} from "./TimeHandler";
 
 export class TeamMemberAndTimeCell {
-    teamMemberIndex:number;
-    sequence:number;
+    teamMemberHandler:TeamMemberHandler;
+    timeHandler:TimeHandler;
     cell:JQuery;
-    plugin:AllocationTablePlugin;
 
-    constructor(gridIndex:number, cell:JQuery, plugin:AllocationTablePlugin, countTeamMembersFunction:()=>number) {
+    constructor(cell:JQuery, teamMemberHandler:TeamMemberHandler, timeHandler:TimeHandler) {
         this.cell = cell;
-        this.plugin = plugin;
-        let teamMembers:number = countTeamMembersFunction();
-        this.teamMemberIndex = gridIndex%teamMembers;
-        this.sequence = Math.floor(gridIndex/teamMembers);
+        this.teamMemberHandler = teamMemberHandler;
+        this.timeHandler = timeHandler;
+        // push me
+        this.teamMemberHandler.member.registerCell(this);
     }
 
     attach():void {
@@ -20,12 +20,10 @@ export class TeamMemberAndTimeCell {
     }
 
     onCellHoverIn(event:JQueryEventObject) {
-        let m:TeamMemberAndTimeCell = jQuery(event.target).data("allocation-moment");
-        let estimation:number =this.plugin.options.estimationProvider.estimate({
+        let cell:TeamMemberAndTimeCell = jQuery(event.target).data("allocation-moment");
+        let estimation:number = cell.teamMemberHandler.member.estimateFor({
             id: "TODO", // todo
             color: "TODO" // todo
-        }, {
-            id: "TODO-001" // todo
         });
         this.forConsecutiveTeamCells(event, (moment:TeamMemberAndTimeCell)=> {
             moment.cell.addClass("moving");
@@ -43,8 +41,8 @@ export class TeamMemberAndTimeCell {
     }
 
     forConsecutiveTeamCells(event:JQueryEventObject, handler:(moment:TeamMemberAndTimeCell)=>void, estimation:number=10000) {
-        let moment:TeamMemberAndTimeCell = jQuery(event.target).data("allocation-moment");
-        let nextElements:Array<TeamMemberAndTimeCell> = this.plugin.mapping.getNextElementsByTeamMember(moment);
+        let cell:TeamMemberAndTimeCell = jQuery(event.target).data("allocation-moment");
+        let nextElements:Array<TeamMemberAndTimeCell> = cell.teamMemberHandler.member.getNextCells(cell.timeHandler.id);
         let howManyCells:number = estimation;
         let i = 1;
         for(let cell of nextElements) {

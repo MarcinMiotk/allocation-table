@@ -4,8 +4,16 @@ $(document).ready(function() {
                 "AllocationTablePlugin",
                 "estimations/EstimationProviderFake",
                 "team/TeamMembersProviderFake",
-                "providers/TimeTranslatorSecondFake"
-            ], function (allocationsTable, estimation, team, time) {
+                "providers/TimeTranslatorSecondFake",
+                "allocations/AllocationsProviderFake",
+                "tasks/VisualizedTasksProviderFake"
+            ], function (
+                allocationsTable,
+                estimation,
+                team,
+                time,
+                allocationsFake,
+                tasksProvider) {
 
         var teamMembersProvider = new team.TeamMembersProviderFake();
         var teamMembersSize = teamMembersProvider.load().length;
@@ -16,13 +24,10 @@ $(document).ready(function() {
             timeTranslator: new time.TimeTranslatorSecondFake(),
             teamMembersProvider: teamMembersProvider,
             gridElementsSelector: "tbody tr td:not(:first-child)",
-            countTeamMembers: function() {
-                return teamMembersSize;
-            },
             countHoursInTimescale: function () {
-                return 200;
+                return 31;
             }
-        }).attach();
+        }).attach().display(new allocationsFake.AllocationsProviderFake(), new tasksProvider.VisualizedTasksProviderFake());
     });
 });
 

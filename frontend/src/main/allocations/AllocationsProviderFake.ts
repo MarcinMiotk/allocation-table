@@ -9,63 +9,58 @@ export class AllocationsProviderFake implements AllocationsProvider {
 
         allocations.push({
             what: "TASK-1",
-            who: "mami",
-            hourStart: 3
+            who: "user0",
+            hourStart: 22
         });
 
         allocations.push({
             what: "TASK-2",
-            who: "mami",
-            hourStart: 3
+            who: "user1",
+            hourStart: 14
         });
 
         allocations.push({
             what: "TASK-3",
-            who: "mami",
-            hourStart: 3
+            who: "user1",
+            hourStart: 10
         });
 
         allocations.push({
             what: "TASK-4",
-            who: "mami",
+            who: "user3",
             hourStart: 3
         });
 
         allocations.push({
             what: "TASK-5",
-            who: "mami",
-            hourStart: 3
+            who: "user4",
+            hourStart: 7
         });
 
         allocations.push({
             what: "TASK-6",
-            who: "mami",
-            hourStart: 3
+            who: "user4",
+            hourStart: 18
         });
 
         allocations.push({
             what: "TASK-7",
-            who: "mami",
+            who: "user5",
             hourStart: 3
         });
 
         allocations.push({
             what: "TASK-8",
-            who: "mami",
-            hourStart: 3
+            who: "user6",
+            hourStart: 12
         });
 
         allocations.push({
             what: "TASK-9",
-            who: "mami",
+            who: "user7",
             hourStart: 3
         });
 
-        allocations.push({
-            what: "TASK-10",
-            who: "mami",
-            hourStart: 3
-        });
 
         return allocations;
     }

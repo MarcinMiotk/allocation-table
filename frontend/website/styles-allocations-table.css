@@ -27,12 +27,26 @@ div.container.allocations table tbody tr td:first-child {
     text-align: right;
 }
 
+div.container.allocations table tbody tr:not(:nth-child(12n+7)):not(:nth-child(12n+8)):not(:nth-child(12n+9)):not(:nth-child(12n+10)):not(:nth-child(12n+11)):not(:nth-child(12n+12)) td:first-child {
+    background:palegoldenrod;
+    width: auto;
+    text-align: right;
+}
+
+
 div.container.allocations table tbody tr td{
     background: whitesmoke;
     width: 50px;
-    border: 1px dotted white;
+    /* ridge groove */
+    border: 1px ridge whitesmoke;
 }
 
+div.container.allocations table tbody tr:not(:nth-child(12n+7)):not(:nth-child(12n+8)):not(:nth-child(12n+9)):not(:nth-child(12n+10)):not(:nth-child(12n+11)):not(:nth-child(12n+12)) td{
+    background: floralwhite;
+    width: 50px;
+    /* ridge groove */
+    border: 1px ridge floralwhite;
+}
 
 div.container.allocations table tbody tr td.moving {
     background-color: pink;
