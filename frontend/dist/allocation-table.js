@@ -29,6 +29,7 @@ define("ui/TeamMemberAndTimeCell", ["require", "exports"], function (require, ex
         };
         TeamMemberAndTimeCell.prototype.onCellHoverIn = function (event) {
             var cell = jQuery(event.target).data("allocation-moment");
+            // TODO: load VisualizedTask from CACHE (for example from external place)
             var estimation = cell.teamMemberHandler.member.estimateFor({
                 id: "TODO",
                 color: "TODO" // todo
@@ -78,7 +79,7 @@ define("ui/TeamMemberHandler", ["require", "exports"], function (require, export
         };
         TeamMemberHandlerOperations.prototype.getNextCells = function (sinceTimeSequenceId) {
             var meAndNextElements = new Array();
-            for (var i = sinceTimeSequenceId; i < this.cells.length; i++) {
+            for (var i = sinceTimeSequenceId - 1; i < this.cells.length; i++) {
                 meAndNextElements.push(this.cells[i]);
             }
             return meAndNextElements;
@@ -165,6 +166,7 @@ define("ui/TeamMembersBodyCellsBuilder", ["require", "exports", "ui/TeamMemberHa
                 var c = consecutiveCells_1[_i];
                 c.cell.css("background-color", what.color);
                 //  c.cell.text(what.id);
+                // TODO: I will assign VisualizedTask here
                 coloredHours++;
                 if (coloredHours >= estimation) {
                     break;
@@ -469,6 +471,39 @@ define("tasks/VisualizedTasksProviderFake", ["require", "exports"], function (re
         return VisualizedTasksProviderFake;
     }());
     exports.VisualizedTasksProviderFake = VisualizedTasksProviderFake;
+});
+define("tasks-table/TasksTablePlugin", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var TasksTablePlugin = (function () {
+        function TasksTablePlugin(table, options) {
+            this.table = table;
+            this.options = options;
+        }
+        TasksTablePlugin.prototype.attach = function () {
+            //        new TeamMembersHeaderBuilder().build(this.table, this.options.teamMembersProvider);
+            //        new TimescaleBodyCellsBuilder().build(this.table, this.options.countHoursInTimescale, this.options.timeTranslator);
+            //
+            //        let cellsBuilder:TeamMembersBodyCellsBuilder = new TeamMembersBodyCellsBuilder(this.options.teamMembersProvider, this.options.estimationProvider);
+            //       cellsBuilder.build(this.table);
+            //      this.cachedCellsBuilder = cellsBuilder;
+            //
+            this.table.find(this.options.gridElementsSelector).each(jQuery.proxy(this.forEachCell, this));
+            return this;
+        };
+        TasksTablePlugin.prototype.forEachCell = function (index, element) {
+            var cell = jQuery(element);
+            //        let memberHandler:TeamMemberHandler = TeamMemberHandlerAccessor.get(cell);
+            //        let timeHandler:TimeHandler = TimeHandlerAccessor.get(cell.parent());
+            //       let moment:TeamMemberAndTimeCell = new TeamMemberAndTimeCell(
+            //          cell,
+            //          memberHandler,
+            //          timeHandler
+            //      );
+            //      moment.attach();
+        };
+        return TasksTablePlugin;
+    }());
+    exports.TasksTablePlugin = TasksTablePlugin;
 });
 define("team/TeamMembersProviderFake", ["require", "exports"], function (require, exports) {
     "use strict";

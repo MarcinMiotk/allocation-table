@@ -21,6 +21,9 @@ export class TeamMemberAndTimeCell {
 
     onCellHoverIn(event:JQueryEventObject) {
         let cell:TeamMemberAndTimeCell = jQuery(event.target).data("allocation-moment");
+
+        // TODO: load VisualizedTask from CACHE (for example from external place)
+
         let estimation:number = cell.teamMemberHandler.member.estimateFor({
             id: "TODO", // todo
             color: "TODO" // todo

@@ -1,0 +1,68 @@
+div.container.tasks {
+    text-align: center;
+    margin: 0px;
+    float: right;
+}
+
+
+
+div.container.tasks h1 {
+    color: papayawhip;
+    text-align: center;
+    margin: 0px;
+    padding: 0px;
+}
+
+div.container.tasks table{
+    background-color: wheat;
+    border: 0px dashed black;
+}
+
+div.container.tasks table tbody td {
+    border-bottom: 1px dashed black;
+}
+
+div.container.tasks table tbody td.who-can {
+    font-size: larger;
+    width: 200px;
+    text-align: left;
+}
+
+div.container.tasks table tbody td.estimations {
+    text-align: right;
+}
+
+div.container.tasks table tbody td.estimations input {
+    width: 60px;
+}
+
+div.container.tasks table tbody td.estimations span.selected {
+    color:coral !important;
+}
+
+    /* ########################################## */
+
+div.container.tasks .btn-on {
+    background-color:#4CAF50 !important;
+}
+
+div.container.tasks .btn-on.selected {
+    background-color:coral !important;
+}
+
+
+div.container.tasks .btn-off {
+    background-color:darkgray !important;
+}
+
+div.container.tasks .btn {
+    background-color:#4CAF50;
+    border:none;
+    color:#FFFFFF;
+    /* font-size:16px; */
+    margin:5px 0 !important;
+    /*padding:15px 32px;*/
+    text-align:center;
+    text-decoration:none;
+    transition-duration:0.4s;
+}

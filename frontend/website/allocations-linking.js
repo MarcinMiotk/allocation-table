@@ -25,7 +25,7 @@ $(document).ready(function() {
             teamMembersProvider: teamMembersProvider,
             gridElementsSelector: "tbody tr td:not(:first-child)",
             countHoursInTimescale: function () {
-                return 31;
+                return 61;
             }
         }).attach().display(new allocationsFake.AllocationsProviderFake(), new tasksProvider.VisualizedTasksProviderFake());
     });

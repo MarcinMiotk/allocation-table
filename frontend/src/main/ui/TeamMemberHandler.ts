@@ -23,7 +23,7 @@ export class TeamMemberHandlerOperations {
 
     getNextCells(sinceTimeSequenceId:number):Array<TeamMemberAndTimeCell> {
         let meAndNextElements:Array<TeamMemberAndTimeCell> = new Array();
-        for(let i:number=sinceTimeSequenceId; i<this.cells.length; i++) {
+        for(let i:number=sinceTimeSequenceId-1; i<this.cells.length; i++) {
             meAndNextElements.push(this.cells[i]);
         }
         return meAndNextElements;

@@ -49,10 +49,10 @@ div.container.allocations table tbody tr:not(:nth-child(12n+7)):not(:nth-child(1
 }
 
 div.container.allocations table tbody tr td.moving {
-    background-color: pink;
+    background-color: pink !important;
     font-size: xx-small;
     color: black;
-    border: 1px dashed #2b2b2b;
+    border: 1px dashed #2b2b2b !important;
 }
 
 

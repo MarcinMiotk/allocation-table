@@ -5,6 +5,7 @@
     <title>Allocation Table</title>
     <link rel="stylesheet" href="styles-page.css">
     <link rel="stylesheet" href="styles-allocations-table.css">
+    <link rel="stylesheet" href="styles-tasks-table.css">
 
     <script type="text/javascript" src="../node_modules/jquery/dist/jquery.js"></script>
     <script type="text/javascript" src="../node_modules/requirejs/require.js"></script>
@@ -15,6 +16,340 @@
 
 </script>
 <script type="text/javascript" src="allocations-linking.js"></script>
+
+<div class="container tasks">
+    <h1>Zadania</h1>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Kolor</th>
+            <th>Identyfikator</th>
+            <th>Termin</th>
+            <th>Temat</th>
+            <th>Kto może je zrobić?</th>
+            <th>Komu to ile zajmie?</th>
+            <th>Usuń</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="color" style="background-color: #ca3a11;">1</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-off">user1</button>
+                <button type="button" class="btn btn-off">user2</button>
+                <button type="button" class="btn btn-off">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user2: <input type="number"/><br/>
+                user5: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+        <tr>
+            <td class="color" style="background-color: #eeeeee;">2</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+
+
+        <tr>
+            <td class="color" style="background-color: hotpink;">3</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td class="color" style="background-color: forestgreen;">4</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td class="color" style="background-color: yellow;">5</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td class="color" style="background-color: #8a4182;">6</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+
+        <tr class="selected">
+            <td class="color" style="background-color: darkslategrey;">7</td>
+            <td  style="background-color: darkslategrey;">JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on selected">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+                <span class="selected">user4: </span><input type="number"/><br/>
+                user6: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td class="color" style="background-color: lawngreen;">8</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td class="color" style="background-color: palevioletred;">9</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td class="color" style="background-color: cadetblue;">10</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+
+
+        <tr>
+            <td class="color" style="background-color: coral;">11</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+
+
+        <tr>
+            <td class="color" style="background-color: cornflowerblue;">12</td>
+            <td>JIRA-001</td>
+            <td>5.10.2016</td>
+            <td>Testowanie środowiska</td>
+            <td class="who-can">
+                <button type="button" class="btn btn-on">user0</button>
+                <button type="button" class="btn btn-on">user1</button>
+                <button type="button" class="btn btn-on">user2</button>
+                <button type="button" class="btn btn-on">user3</button>
+                <button type="button" class="btn btn-on">user4</button>
+                <button type="button" class="btn btn-off">user5</button>
+                <button type="button" class="btn btn-on">user6</button>
+                <button type="button" class="btn btn-off">user7</button>
+            </td>
+            <td class="estimations">
+                user0: <input type="number"/><br/>
+                user3: <input type="number"/><br/>
+            </td>
+            <td class="remove-task">
+                <button type="button">Usuń</button>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+</div>
 
 <div class="container allocations">
     <h1>Mapa Alokacji</h1>
@@ -33,7 +368,7 @@
         </thead>
         <tbody>
         <tr>
-            <td>2016-10-15 09:00</td>
+            <td>2016-10-15</td>
             <td></td>
             <td></td>
             <td></td>
@@ -105,7 +440,7 @@
             <td></td>
         </tr>
         <tr>
-            <td>2016-10-16 09:00</td>
+            <td>2016-10-16</td>
             <td style="background-color: #007069"></td>
             <td></td>
             <td></td>

@@ -55,6 +55,8 @@ export class TeamMembersBodyCellsBuilder {
             c.cell.css("background-color", what.color);
           //  c.cell.text(what.id);
 
+            // TODO: I will assign VisualizedTask here
+
 
             coloredHours++;
             if(coloredHours>=estimation) {
