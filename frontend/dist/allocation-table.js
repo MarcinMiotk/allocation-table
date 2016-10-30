@@ -501,7 +501,56 @@ define("tasks-table/ui/TeamTaskHandlerAccessor", ["require", "exports"], functio
     }());
     exports.TeamTaskHandlerAccessor = TeamTaskHandlerAccessor;
 });
-define("tasks-table/ui/TasksBodyCellsBuilder", ["require", "exports", "tasks-table/ui/TeamTaskHandlerAccessor"], function (require, exports, TeamTaskHandlerAccessor_1) {
+define("tasks-table/ui/WhoCanBuilder", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var WhoCanBuilder = (function () {
+        function WhoCanBuilder(cell) {
+            this.cell = cell;
+        }
+        WhoCanBuilder.prototype.attach = function () {
+            // TODO: get users from TeamMembers provider
+            for (var i = 1; i < 9; i++) {
+                var button = jQuery("<button>");
+                button.text("user" + i);
+                button.attr("type", "button");
+                button.addClass("btn");
+                if (i % 2 == 0) {
+                    button.addClass("btn-on");
+                }
+                else {
+                    button.addClass("btn-off");
+                }
+                this.cell.append(" ");
+                this.cell.append(button);
+            }
+        };
+        return WhoCanBuilder;
+    }());
+    exports.WhoCanBuilder = WhoCanBuilder;
+});
+define("tasks-table/ui/EstimationsCellBuilder", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var EstimationsCellBuilder = (function () {
+        function EstimationsCellBuilder(cell) {
+            this.cell = cell;
+        }
+        EstimationsCellBuilder.prototype.attach = function () {
+            // TODO: get users from TeamMembers provider
+            for (var i = 1; i < 9; i++) {
+                this.cell.append("user" + i);
+                this.cell.append(" ");
+                var input = jQuery("<input>");
+                input.val(4);
+                input.attr("type", "number");
+                this.cell.append(input);
+                this.cell.append(jQuery("<br/>"));
+            }
+        };
+        return EstimationsCellBuilder;
+    }());
+    exports.EstimationsCellBuilder = EstimationsCellBuilder;
+});
+define("tasks-table/ui/TasksBodyCellsBuilder", ["require", "exports", "tasks-table/ui/TeamTaskHandlerAccessor", "tasks-table/ui/WhoCanBuilder", "tasks-table/ui/EstimationsCellBuilder"], function (require, exports, TeamTaskHandlerAccessor_1, WhoCanBuilder_1, EstimationsCellBuilder_1) {
     "use strict";
     var TasksBodyCellsBuilder = (function () {
         function TasksBodyCellsBuilder(tasksProvider) {
@@ -546,13 +595,19 @@ define("tasks-table/ui/TasksBodyCellsBuilder", ["require", "exports", "tasks-tab
                 {
                     var cell = jQuery("<td>");
                     cell.addClass("who-can");
-                    cell.text("....");
+                    {
+                        var whoCan = new WhoCanBuilder_1.WhoCanBuilder(cell);
+                        whoCan.attach();
+                    }
                     row.append(cell);
                 }
                 {
                     var cell = jQuery("<td>");
                     cell.addClass("estimations");
-                    cell.text("....");
+                    {
+                        var estimationsCell = new EstimationsCellBuilder_1.EstimationsCellBuilder(cell);
+                        estimationsCell.attach();
+                    }
                     row.append(cell);
                 }
                 {

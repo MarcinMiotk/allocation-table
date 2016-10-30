@@ -1,5 +1,7 @@
 import {TeamTasksProvider} from "../tasks/TeamTasksProvider";
 import {TeamTaskHandlerAccessor} from "./TeamTaskHandlerAccessor";
+import {WhoCanBuilder} from "./WhoCanBuilder";
+import {EstimationsCellBuilder} from "./EstimationsCellBuilder";
 export class TasksBodyCellsBuilder {
 
     private tasksProvider:TeamTasksProvider;
@@ -55,14 +57,22 @@ export class TasksBodyCellsBuilder {
             {   // Who can do?
                 let cell:JQuery = jQuery("<td>");
                 cell.addClass("who-can");
-                cell.text("....");
+
+                {
+                    let whoCan:WhoCanBuilder = new WhoCanBuilder(cell);
+                    whoCan.attach();
+                }
+
                 row.append(cell);
             }
 
             {   // Estimations
                 let cell:JQuery = jQuery("<td>");
                 cell.addClass("estimations");
-                cell.text("....");
+                {
+                    let estimationsCell:EstimationsCellBuilder = new EstimationsCellBuilder(cell);
+                    estimationsCell.attach();
+                }
                 row.append(cell);
             }
 
