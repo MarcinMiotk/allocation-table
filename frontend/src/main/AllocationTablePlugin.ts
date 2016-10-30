@@ -63,7 +63,8 @@ export class AllocationTablePlugin {
         let moment:TeamMemberAndTimeCell = new TeamMemberAndTimeCell(
             cell,
             memberHandler,
-            timeHandler
+            timeHandler,
+            this.options.readSelectedTask
             );
         moment.attach();
     }
@@ -77,6 +78,7 @@ export interface AllocationTableOptions {
     estimationProvider:EstimationProvider;
     teamMembersProvider:TeamMembersProvider;
     timeTranslator:TimeTranslator;
+    readSelectedTask: ()=>VisualizedTask;
 }
 
 

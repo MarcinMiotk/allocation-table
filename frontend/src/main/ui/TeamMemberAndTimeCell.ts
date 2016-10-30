@@ -1,15 +1,18 @@
 import {TeamMemberHandler} from "./TeamMemberHandler";
 import {TimeHandler} from "./TimeHandler";
+import {VisualizedTask} from "../tasks/VisualizedTask";
 
 export class TeamMemberAndTimeCell {
-    teamMemberHandler:TeamMemberHandler;
-    timeHandler:TimeHandler;
-    cell:JQuery;
+    private teamMemberHandler:TeamMemberHandler;
+    private timeHandler:TimeHandler;
+    private cell:JQuery;
+    private readSelectedTask: ()=>VisualizedTask;
 
-    constructor(cell:JQuery, teamMemberHandler:TeamMemberHandler, timeHandler:TimeHandler) {
+    constructor(cell:JQuery, teamMemberHandler:TeamMemberHandler, timeHandler:TimeHandler, readSelectedTask: ()=>VisualizedTask) {
         this.cell = cell;
         this.teamMemberHandler = teamMemberHandler;
         this.timeHandler = timeHandler;
+        this.readSelectedTask = readSelectedTask;
         // push me
         this.teamMemberHandler.member.registerCell(this);
     }
@@ -22,22 +25,22 @@ export class TeamMemberAndTimeCell {
     onCellHoverIn(event:JQueryEventObject) {
         let cell:TeamMemberAndTimeCell = jQuery(event.target).data("allocation-moment");
 
-        // TODO: load VisualizedTask from CACHE (for example from external place)
-
-        let estimation:number = cell.teamMemberHandler.member.estimateFor({
-            id: "TODO", // todo
-            color: "TODO" // todo
-        });
-        this.forConsecutiveTeamCells(event, (moment:TeamMemberAndTimeCell)=> {
-            moment.cell.addClass("moving");
-            moment.cell.text("moving");
-        }, estimation);
+        let task:VisualizedTask = this.readSelectedTask();
+        if(task!=null) {
+            let estimation:number = cell.teamMemberHandler.member.estimateFor(task);
+            this.forConsecutiveTeamCells(event, (moment:TeamMemberAndTimeCell)=> {
+                moment.cell.addClass("moving");
+                moment.cell.text("moving");
+                moment.cell.css("background-color", task.color);
+            }, estimation);
+        }
     }
 
     onCellHoverOut(event:JQueryEventObject) {
         this.forConsecutiveTeamCells(event, (moment:TeamMemberAndTimeCell)=> {
             if(moment.cell.hasClass("moving")) {
                 moment.cell.removeClass("moving");
+                moment.cell.css("background-color", "");
                 moment.cell.text("");
             }
         });

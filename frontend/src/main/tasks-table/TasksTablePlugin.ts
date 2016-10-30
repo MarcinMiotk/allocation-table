@@ -1,3 +1,8 @@
+import {TasksBodyCellsBuilder} from "./ui/TasksBodyCellsBuilder";
+import {TeamTasksProvider} from "./tasks/TeamTasksProvider";
+import {TeamTaskHandlerAccessor} from "./ui/TeamTaskHandlerAccessor";
+import {TeamTaskHandler} from "./ui/TeamTaskHandler";
+import {TeamTask} from "./tasks/TeamTask";
 export class TasksTablePlugin {
 
     table:JQuery;
@@ -9,37 +14,39 @@ export class TasksTablePlugin {
     }
 
     attach():TasksTablePlugin {
-//        new TeamMembersHeaderBuilder().build(this.table, this.options.teamMembersProvider);
-//        new TimescaleBodyCellsBuilder().build(this.table, this.options.countHoursInTimescale, this.options.timeTranslator);
-        //
-//        let cellsBuilder:TeamMembersBodyCellsBuilder = new TeamMembersBodyCellsBuilder(this.options.teamMembersProvider, this.options.estimationProvider);
- //       cellsBuilder.build(this.table);
-  //      this.cachedCellsBuilder = cellsBuilder;
-        //
-        this.table.find(this.options.gridElementsSelector).each(jQuery.proxy(this.forEachCell, this));
-
+        new TasksBodyCellsBuilder(this.options.tasksProvider).build(this.table);
+        this.table.find(this.options.gridElementsSelector).each(jQuery.proxy(this.forEachCellWithColor, this));
         return this;
     }
 
-
-    forEachCell(index:number, element:Element) {
+    forEachCellWithColor(index:number, element:Element) {
         let cell:JQuery = jQuery(element);
-//        let memberHandler:TeamMemberHandler = TeamMemberHandlerAccessor.get(cell);
-//        let timeHandler:TimeHandler = TimeHandlerAccessor.get(cell.parent());
-
- //       let moment:TeamMemberAndTimeCell = new TeamMemberAndTimeCell(
-  //          cell,
-  //          memberHandler,
-  //          timeHandler
-  //      );
-  //      moment.attach();
+        let taskHandler:TeamTaskHandler = TeamTaskHandlerAccessor.get(cell.parent());
+        cell.click(taskHandler, jQuery.proxy(this.onClickedTask, this));
     }
 
 
+
+
+    onClickedTask(eventObject:JQueryEventObject) {
+        this.unselectAllRows();
+        let clickedTask:TeamTask = (<TeamTaskHandler>eventObject.data).task;
+        jQuery(eventObject.target).parent().find("td:nth-child(2)").css("background-color", clickedTask.color);
+        this.options.selectTask(clickedTask);
+    }
+
+    unselectAllRows() {
+        this.table.find(this.options.gridElementsSelector).each(function (index:number, element:Element) {
+            let cell:JQuery = jQuery(element);
+            cell.parent().find("td:nth-child(2)").css("background-color", "");
+        });
+    }
 }
 
 
 export interface TasksTableOptions {
     url:string;
     gridElementsSelector:string;
+    tasksProvider:TeamTasksProvider;
+    selectTask: (clickedTask:TeamTask)=>void;
 }

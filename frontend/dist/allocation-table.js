@@ -16,10 +16,11 @@ define("ui/TimeHandler", ["require", "exports"], function (require, exports) {
 define("ui/TeamMemberAndTimeCell", ["require", "exports"], function (require, exports) {
     "use strict";
     var TeamMemberAndTimeCell = (function () {
-        function TeamMemberAndTimeCell(cell, teamMemberHandler, timeHandler) {
+        function TeamMemberAndTimeCell(cell, teamMemberHandler, timeHandler, readSelectedTask) {
             this.cell = cell;
             this.teamMemberHandler = teamMemberHandler;
             this.timeHandler = timeHandler;
+            this.readSelectedTask = readSelectedTask;
             // push me
             this.teamMemberHandler.member.registerCell(this);
         }
@@ -29,20 +30,21 @@ define("ui/TeamMemberAndTimeCell", ["require", "exports"], function (require, ex
         };
         TeamMemberAndTimeCell.prototype.onCellHoverIn = function (event) {
             var cell = jQuery(event.target).data("allocation-moment");
-            // TODO: load VisualizedTask from CACHE (for example from external place)
-            var estimation = cell.teamMemberHandler.member.estimateFor({
-                id: "TODO",
-                color: "TODO" // todo
-            });
-            this.forConsecutiveTeamCells(event, function (moment) {
-                moment.cell.addClass("moving");
-                moment.cell.text("moving");
-            }, estimation);
+            var task = this.readSelectedTask();
+            if (task != null) {
+                var estimation = cell.teamMemberHandler.member.estimateFor(task);
+                this.forConsecutiveTeamCells(event, function (moment) {
+                    moment.cell.addClass("moving");
+                    moment.cell.text("moving");
+                    moment.cell.css("background-color", task.color);
+                }, estimation);
+            }
         };
         TeamMemberAndTimeCell.prototype.onCellHoverOut = function (event) {
             this.forConsecutiveTeamCells(event, function (moment) {
                 if (moment.cell.hasClass("moving")) {
                     moment.cell.removeClass("moving");
+                    moment.cell.css("background-color", "");
                     moment.cell.text("");
                 }
             });
@@ -285,7 +287,7 @@ define("AllocationTablePlugin", ["require", "exports", "ui/TeamMembersBodyCellsB
             var cell = jQuery(element);
             var memberHandler = TeamMemberHandlerAccessor_2.TeamMemberHandlerAccessor.get(cell);
             var timeHandler = TimeHandlerAccessor_2.TimeHandlerAccessor.get(cell.parent());
-            var moment = new TeamMemberAndTimeCell_1.TeamMemberAndTimeCell(cell, memberHandler, timeHandler);
+            var moment = new TeamMemberAndTimeCell_1.TeamMemberAndTimeCell(cell, memberHandler, timeHandler, this.options.readSelectedTask);
             moment.attach();
         };
         return AllocationTablePlugin;
@@ -472,7 +474,109 @@ define("tasks/VisualizedTasksProviderFake", ["require", "exports"], function (re
     }());
     exports.VisualizedTasksProviderFake = VisualizedTasksProviderFake;
 });
-define("tasks-table/TasksTablePlugin", ["require", "exports"], function (require, exports) {
+define("tasks-table/tasks/TeamTaskEstimation", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("tasks-table/tasks/TeamTask", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("tasks-table/tasks/TeamTasksProvider", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("tasks-table/ui/TeamTaskHandler", ["require", "exports"], function (require, exports) {
+    "use strict";
+});
+define("tasks-table/ui/TeamTaskHandlerAccessor", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var TeamTaskHandlerAccessor = (function () {
+        function TeamTaskHandlerAccessor() {
+        }
+        TeamTaskHandlerAccessor.get = function (row) {
+            return row.data("TeamTaskHandler");
+        };
+        TeamTaskHandlerAccessor.set = function (row, handler) {
+            row.data("TeamTaskHandler", handler);
+        };
+        return TeamTaskHandlerAccessor;
+    }());
+    exports.TeamTaskHandlerAccessor = TeamTaskHandlerAccessor;
+});
+define("tasks-table/ui/TasksBodyCellsBuilder", ["require", "exports", "tasks-table/ui/TeamTaskHandlerAccessor"], function (require, exports, TeamTaskHandlerAccessor_1) {
+    "use strict";
+    var TasksBodyCellsBuilder = (function () {
+        function TasksBodyCellsBuilder(tasksProvider) {
+            this.tasksProvider = tasksProvider;
+        }
+        TasksBodyCellsBuilder.prototype.build = function (table) {
+            this.removeAllTeamCellsFromBodyTemplate(table);
+            this.addRowsTo(table.find("tbody"));
+        };
+        TasksBodyCellsBuilder.prototype.addRowsTo = function (tbody) {
+            var sequence = 1;
+            for (var _i = 0, _a = this.tasksProvider.all(); _i < _a.length; _i++) {
+                var task = _a[_i];
+                var row = jQuery("<tr>");
+                {
+                    TeamTaskHandlerAccessor_1.TeamTaskHandlerAccessor.set(row, {
+                        task: task
+                    });
+                }
+                {
+                    var color = jQuery("<td>");
+                    color.addClass("color");
+                    color.css("background-color", task.color);
+                    color.text(sequence++);
+                    row.append(color);
+                }
+                {
+                    var cell = jQuery("<td>");
+                    cell.text(task.id);
+                    row.append(cell);
+                }
+                {
+                    var cell = jQuery("<td>");
+                    cell.text(task.deadline);
+                    row.append(cell);
+                }
+                {
+                    var cell = jQuery("<td>");
+                    cell.text(task.subject);
+                    row.append(cell);
+                }
+                {
+                    var cell = jQuery("<td>");
+                    cell.addClass("who-can");
+                    cell.text("....");
+                    row.append(cell);
+                }
+                {
+                    var cell = jQuery("<td>");
+                    cell.addClass("estimations");
+                    cell.text("....");
+                    row.append(cell);
+                }
+                {
+                    var cell = jQuery("<td>");
+                    cell.addClass("remove-task");
+                    {
+                        var remove = jQuery("<button>");
+                        remove.attr("type", "button");
+                        remove.text("Usuń");
+                        cell.append(remove);
+                    }
+                    row.append(cell);
+                }
+                tbody.append(row);
+            }
+        };
+        TasksBodyCellsBuilder.prototype.removeAllTeamCellsFromBodyTemplate = function (table) {
+            table.find("tbody tr").remove();
+        };
+        return TasksBodyCellsBuilder;
+    }());
+    exports.TasksBodyCellsBuilder = TasksBodyCellsBuilder;
+});
+define("tasks-table/TasksTablePlugin", ["require", "exports", "tasks-table/ui/TasksBodyCellsBuilder", "tasks-table/ui/TeamTaskHandlerAccessor"], function (require, exports, TasksBodyCellsBuilder_1, TeamTaskHandlerAccessor_2) {
     "use strict";
     var TasksTablePlugin = (function () {
         function TasksTablePlugin(table, options) {
@@ -480,30 +584,123 @@ define("tasks-table/TasksTablePlugin", ["require", "exports"], function (require
             this.options = options;
         }
         TasksTablePlugin.prototype.attach = function () {
-            //        new TeamMembersHeaderBuilder().build(this.table, this.options.teamMembersProvider);
-            //        new TimescaleBodyCellsBuilder().build(this.table, this.options.countHoursInTimescale, this.options.timeTranslator);
-            //
-            //        let cellsBuilder:TeamMembersBodyCellsBuilder = new TeamMembersBodyCellsBuilder(this.options.teamMembersProvider, this.options.estimationProvider);
-            //       cellsBuilder.build(this.table);
-            //      this.cachedCellsBuilder = cellsBuilder;
-            //
-            this.table.find(this.options.gridElementsSelector).each(jQuery.proxy(this.forEachCell, this));
+            new TasksBodyCellsBuilder_1.TasksBodyCellsBuilder(this.options.tasksProvider).build(this.table);
+            this.table.find(this.options.gridElementsSelector).each(jQuery.proxy(this.forEachCellWithColor, this));
             return this;
         };
-        TasksTablePlugin.prototype.forEachCell = function (index, element) {
+        TasksTablePlugin.prototype.forEachCellWithColor = function (index, element) {
             var cell = jQuery(element);
-            //        let memberHandler:TeamMemberHandler = TeamMemberHandlerAccessor.get(cell);
-            //        let timeHandler:TimeHandler = TimeHandlerAccessor.get(cell.parent());
-            //       let moment:TeamMemberAndTimeCell = new TeamMemberAndTimeCell(
-            //          cell,
-            //          memberHandler,
-            //          timeHandler
-            //      );
-            //      moment.attach();
+            var taskHandler = TeamTaskHandlerAccessor_2.TeamTaskHandlerAccessor.get(cell.parent());
+            cell.click(taskHandler, jQuery.proxy(this.onClickedTask, this));
+        };
+        TasksTablePlugin.prototype.onClickedTask = function (eventObject) {
+            this.unselectAllRows();
+            var clickedTask = eventObject.data.task;
+            jQuery(eventObject.target).parent().find("td:nth-child(2)").css("background-color", clickedTask.color);
+            this.options.selectTask(clickedTask);
+        };
+        TasksTablePlugin.prototype.unselectAllRows = function () {
+            this.table.find(this.options.gridElementsSelector).each(function (index, element) {
+                var cell = jQuery(element);
+                cell.parent().find("td:nth-child(2)").css("background-color", "");
+            });
         };
         return TasksTablePlugin;
     }());
     exports.TasksTablePlugin = TasksTablePlugin;
+});
+define("tasks-table/tasks/TeamTasksProviderFake", ["require", "exports"], function (require, exports) {
+    "use strict";
+    var TeamTasksProviderFake = (function () {
+        function TeamTasksProviderFake() {
+        }
+        TeamTasksProviderFake.prototype.all = function () {
+            var result = new Array();
+            result.push({
+                color: "green",
+                id: "JIRA-001",
+                deadline: "5.10.2016",
+                subject: "Jakiś temat",
+                whoCanDo: [
+                    {
+                        who: "user0",
+                        estimation: 3
+                    },
+                    {
+                        who: "user1",
+                        estimation: 7
+                    }
+                ]
+            });
+            result.push({
+                color: "pink",
+                id: "JIRA-002",
+                deadline: "6.10.2016",
+                subject: "Inny temat o jakiejś treści",
+                whoCanDo: [
+                    {
+                        who: "user0",
+                        estimation: 4
+                    },
+                    {
+                        who: "user1",
+                        estimation: 4
+                    }
+                ]
+            });
+            result.push({
+                color: "brown",
+                id: "JIRA-003",
+                deadline: "7.10.2016",
+                subject: "Odbisać na maile",
+                whoCanDo: [
+                    {
+                        who: "user0",
+                        estimation: 4
+                    },
+                    {
+                        who: "user1",
+                        estimation: 4
+                    }
+                ]
+            });
+            result.push({
+                color: "yellow",
+                id: "JIRA-004",
+                deadline: "12.10.2016",
+                subject: "Rozmowa rekrutacyjna",
+                whoCanDo: [
+                    {
+                        who: "user0",
+                        estimation: 4
+                    },
+                    {
+                        who: "user1",
+                        estimation: 4
+                    }
+                ]
+            });
+            result.push({
+                color: "white",
+                id: "JIRA-005",
+                deadline: "22.10.2016",
+                subject: "Konsultacja telefoniczna z klientem ABCD",
+                whoCanDo: [
+                    {
+                        who: "user0",
+                        estimation: 4
+                    },
+                    {
+                        who: "user1",
+                        estimation: 4
+                    }
+                ]
+            });
+            return result;
+        };
+        return TeamTasksProviderFake;
+    }());
+    exports.TeamTasksProviderFake = TeamTasksProviderFake;
 });
 define("team/TeamMembersProviderFake", ["require", "exports"], function (require, exports) {
     "use strict";
